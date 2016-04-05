@@ -1,4 +1,4 @@
-package com.energyhub.interview.setgame.descriptors;
+package com.energyhub.interview.setgame;
 
 import java.util.ArrayList;
 import java.util.Arrays;

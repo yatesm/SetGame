@@ -1,14 +1,10 @@
 package com.energyhub.interview.setgame;
 
-import com.energyhub.interview.setgame.descriptors.Color;
-import com.energyhub.interview.setgame.descriptors.Shading;
-import com.energyhub.interview.setgame.descriptors.Symbol;
-
 public class Card {
 	private final Color color;
 	private final Shading shading;
 	private final Symbol symbol;
-	private final int number;
+	private final Integer number;
 	
 	/**
 	 * 
@@ -21,14 +17,14 @@ public class Card {
 		this.color = color;
 		this.shading = shading;
 		this.symbol = symbol;
-		this.number = number;
+		this.number = new Integer(number);
 	}
 	
 	@Override
 	public String toString() {
-		String s = number + " " + color + " " + shading + " " + symbol;
+		String s = number + " " + shading + " " + color + " " + symbol;
 		if(number > 1)
-			s = s + "s";
+			s = s + "S";
 		return s;
 				
 	}
@@ -47,7 +43,7 @@ public class Card {
 		return symbol;
 	}
 	
-	public int getNumber() {
+	public Integer getNumber() {
 		return number;
 	}
 	
