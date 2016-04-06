@@ -17,8 +17,10 @@ public enum Shading {
 	private static final Random rand = new Random();
 
 	/**
-	 * @return A randomly selected shading from the enum
-     */
+	 * Method to get a random value from the enum
+	 *
+	 * @return a random value from the enum
+	 */
 	public static Shading getRandomShading() {
 		return values.get(rand.nextInt(values.size()));
 	}

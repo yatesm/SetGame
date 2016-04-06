@@ -12,7 +12,12 @@ public enum Color {
 	
 	private static final List<Color> values = new ArrayList<Color>(Arrays.asList(values()));
 	private static final Random rand = new Random();
-	
+
+	/**
+	 * Method to get a random value from the enum
+	 *
+	 * @return a random value from the enum
+     */
 	public static Color getRandomColor() {
 		return values.get(rand.nextInt(values.size()));
 	}
