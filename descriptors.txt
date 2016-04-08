@@ -1,0 +1,4 @@
+number.txt
+symbol.txt
+color.txt
+shading.txt
