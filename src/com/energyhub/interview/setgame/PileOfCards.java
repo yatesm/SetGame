@@ -4,20 +4,22 @@ package com.energyhub.interview.setgame;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
- * Created by JYMONTE on 4/5/2016.
- *
- * PileOfCards class.  Represents a pile of N cards, specified by the caller.
+  * PileOfCards class.  Represents a pile of N cards, specified by the called constructor.
  */
 public class PileOfCards {
     private final List<Card> pile;
+    private final Set<String> descriptors;
 
     /**
+     * Constructor.  Constructs a pile of cards containing numCards randomly generated cards.
      *
      * @param numCards number of cards to be dealt in total.
      */
     public PileOfCards(int numCards) {
+        descriptors = CardFactory.getDescriptorKeySet();
         pile = new ArrayList<Card>(numCards);
         for(int i = 0; i < numCards; i++)
             pile.add(CardFactory.drawCard());

@@ -1,28 +1,32 @@
 package com.energyhub.interview.setgame;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-@SuppressWarnings("unused")
+/**
+ * Hand class.  Contains data structures to support the aggregation of multiple cards and the logic behind determining
+ * if N cards (a hand) represents a set.
+ */
 public class Hand implements Comparable<Hand> {
 	private final List<Card> hand;
-	
+	private final Set<String> descriptorKeySet;
 	
 	/**
 	 *
 	 * Initializes empty hand
 	 */
 	public Hand() {
+		descriptorKeySet = new HashSet<String>();
 		hand = new ArrayList<Card>();
 	}
 	
 	/**
-	 * Constructs Hand object with containing numCards Cards in its ArrayList
+	 * Constructs Hand object with numCards randomly generated Cards in its ArrayList
+	 * Requires
 	 *
 	 * @param numCards number of cards to populate hand with.
 	 */
-	public Hand(int numCards) {
+	public Hand(int numCards, Set<String> descriptorKeySet) {
+		this.descriptorKeySet = descriptorKeySet;
 		hand = new ArrayList<Card>(numCards);
 		for(int i = 0; i < numCards; i++)
 			hand.add(CardFactory.drawCard());
@@ -59,9 +63,17 @@ public class Hand implements Comparable<Hand> {
      */
 
 	public void addCard(Card card) {
+		//Add the card to the hand
 		hand.add(card);
+		//Add the descriptors from the card to the key set.  Necessary for ensuring the hand knows what descriptors to
+		//compare
+		descriptorKeySet.addAll(card.getDescriptorKeySet());
 	}
-	
+
+	/**
+	 * Overridden toString() method.  Returns a reasonably readable output of a Card object
+	 * @return String representation of Card object.
+     */
 	@Override
 	public String toString() {
 		String s = "";
@@ -84,17 +96,16 @@ public class Hand implements Comparable<Hand> {
      */
 
 	public boolean isSet() {
-		String [] methodNames = {"getSymbol", "getShading", "getNumber", "getColor"};
 		boolean isSet = true;
-		for(int i = 0; i < methodNames.length && isSet; i++) {
-			isSet = isSet && determineIsSet(methodNames[i]);
+		for(String descriptorKey : this.descriptorKeySet) {
+			isSet = isSet && determineIsSet(descriptorKey);
 		}
 		return isSet;
 	}
 
 	/**
-	 * Determines whether the given hand forms a set for the descriptor provided in methodName.  Utilizes class-metadata
-	 * and reflection to call the getter (to access a descriptor) described by methodName.
+	 * Determines whether the given hand forms a set for the descriptor provided in descriptorKey.  Utilizes class-metadata
+	 * and reflection to call the getter (to access a descriptor) described by descriptorKey.
 	 *
 	 * Algorithm is a roughly O(N^2) algorithm, as every card needs to be checked against every other card (excluding
 	 * itself).  The algorithm has been optimized to exclude self-comparisons.  The algorithm has been optimized to
@@ -114,18 +125,22 @@ public class Hand implements Comparable<Hand> {
 	 * single if(hand.get(i).getDescriptor() == hand.get(j).getDescriptor() varying in each function.  While this method
 	 * is a little harder to read, it is far less code to read and more maintainable.
 	 *
-	 * @param methodName the name of the method to get the descriptor currently being checked.
-	 * @return returns whether or not the hand encodes a set for the descriptor described by methodName
+	 * @param descriptorKey the name of the method to get the descriptor currently being checked.
+	 * @return returns whether or not the hand encodes a set for the descriptor described by descriptorKey
      */
 
-	public boolean determineIsSet(String methodName) {
+	public boolean determineIsSet(String descriptorKey) {
 		boolean returnValue = true;
 		int numEquals = 0;
 		int numNotEquals = 0;
+		//Outer loop over each card
 		for(int i = 0; i < this.hand.size() && returnValue; i++) {
+			//Inner loop over each card
 			for(int j = 0; j < this.hand.size(); j++) {
+
+				//Avoid comparing a card to itself.
 				if(i != j) {
-					if(this.methodCaller(hand.get(i), methodName).equals(this.methodCaller(hand.get(j), methodName)))
+					if(hand.get(i).getDescriptor(descriptorKey).compareTo(hand.get(j).getDescriptor(descriptorKey)) == 0)
 						numEquals++;
 					else
 						numNotEquals++;
@@ -147,51 +162,17 @@ public class Hand implements Comparable<Hand> {
 	}
 
 	/**
-	 * Terrible method that utilizes class metadata to invoke methods dynamically.  This function is one strategy for
-	 * significantly reducing the number of duplicate lines/blocks of the code.  The functional difference between
-	 * checking whether a hand is a set of one descriptor vs. another descriptor is the comparison between the values
-	 * of that descriptor.
-	 *
-	 * By utilizing this method, we can pass the string, containing the methodName for the descriptor accessor, to the
-	 * determineIsSet() method (from the isSet() method).
-	 *
-	 *
-	 * @param card the card whose getter method will be invoked
-	 * @param methodName the name of the method that will be invoked
-     * @return the value returned by the function described by methodName
+	 * Comparable interface method implementation.
+	 * @param h the hand the calling object is compared to.
+	 * @return Returns 0 if all cards in the calling object are contained in the
+	 * passed Hand parameter, h.  Returns 1 otherwise, or if two hands are different sized.
      */
-	public Object methodCaller(Card card, String methodName) {
-		Object returnValue = null;
-		try {
-			returnValue = card.getClass().getMethod(methodName).invoke(card);
-		} catch (NoSuchMethodException e) {
-			System.out.println(e.getStackTrace());
-			System.out.println(e.getMessage());
-			System.out.println("Tried to call a method that doesn't exist through reflection while determining isSet.");
-			System.out.println("Exiting.");
-			System.exit(1);
-		} catch (IllegalAccessException e) {
-			System.out.println(e.getStackTrace());
-			System.out.println(e.getMessage());
-			System.out.println("Tried to call a private method method via reflection.");
-			System.out.println("Exiting.");
-			System.exit(1);
-		} catch (InvocationTargetException e) {
-			System.out.println(e.getStackTrace());
-			System.out.println(e.getMessage());
-			System.out.println("Chained exception invoked by " + e.getCause());
-			System.out.println("Exiting.");
-			System.exit(1);
-		}
-		return returnValue;
-	}
-
 	public int compareTo(Hand h) {
 		int returnValue = 0;
 		if(h.size() != this.size())
 			returnValue = -1;
-		for(int i = 0; i < this.size() && returnValue == 0; i++) {
-			if(this.getCard(i).compareTo(h.getCard(i)) != 0) {
+		for(int i = 0; i < h.size() && returnValue == 0; i++) {
+			if(!this.hand.contains((h.getCard(i)))) {
 				returnValue = -1;
 			}
 		}
