@@ -17,15 +17,15 @@ implementation that utilizes enums to encode the descriptors for each class.  Th
  Example:
 
 descriptor.txt
->shading.txt
->color.txt
->number.txt
->symbol.txt
+>shading.txt  
+>color.txt  
+>number.txt  
+>symbol.txt  
 
 symbol.txt
->red
->purple
->green
+>red  
+>purple  
+>green  
 
 The program will prompt the user to enter the number of cards (N) they would like to play with and how many cards form a set (M).
 Once entered, the program will determine how many M-card sets can be generated from the N-cards dealt.
